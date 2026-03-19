@@ -1,0 +1,17 @@
+.git
+.gitignore
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.mypy_cache
+.env
+.venv
+venv
+*.md
+!README.md
+uv.lock
+*.egg-info
+.eggs
+dist
+build
