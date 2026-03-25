@@ -3,13 +3,18 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+# Install package from pyproject (requirements.txt is only "." for local editable installs — needs these paths first).
+COPY pyproject.toml README.md ./
+COPY tradingagents ./tradingagents
+COPY cli ./cli
 
-COPY . .
-RUN pip install --no-cache-dir -e .
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -e .
 
-# Olares entrance: minimal HTTP server on 8080
+# Runtime entry (Olares) + static UI
+COPY serve.py ./
+COPY web_ui ./web_ui/
+
 ENV PORT=8080
 EXPOSE 8080
 CMD ["python", "serve.py"]
