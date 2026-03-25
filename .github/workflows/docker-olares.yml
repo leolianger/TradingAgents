@@ -21,10 +21,13 @@ jobs:
     timeout-minutes: 120
     permissions:
       contents: read
+    env:
+      # GitHub Actions: opt into Node 24 for JS actions (see deprecation notice for Node 20).
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
