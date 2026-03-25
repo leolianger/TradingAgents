@@ -1,0 +1,58 @@
+# Single image: root Dockerfile → Docker Hub ${{ secrets.DOCKERHUB_USERNAME }}/tradingagents
+# For Olares, terminus-apps/tradingagents values.yaml points at this repo+tag.
+#
+# linux/amd64 only: fast, reliable on GHA (multi-arch QEMU is slow for large Python stacks).
+#
+# Triggers: pushes to main only.
+#
+# Secrets (Settings → Actions): DOCKERHUB_USERNAME, DOCKERHUB_TOKEN
+
+name: Docker Hub — tradingagents (Olares)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  docker:
+    name: Build and push tradingagents
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ format('{0}/tradingagents', secrets.DOCKERHUB_USERNAME) }}
+          tags: |
+            type=raw,value=latest
+            type=sha,format=short
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=tradingagents-docker
+          cache-to: type=gha,mode=max,scope=tradingagents-docker
