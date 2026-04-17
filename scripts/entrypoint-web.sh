@@ -10,11 +10,12 @@ resolve_data_dir() {
     printf '%s' "$TRADINGAGENTS_APPDATA"
     return
   fi
-  if [ -d /app/data ] && [ -w /app/data ]; then
+  # Do not require -w: some hostPath mounts report not writable to uid 1000 even when seed worked (init).
+  if [ -d /app/data ]; then
     printf '%s' "/app/data"
     return
   fi
-  if [ -d /home/appuser/.tradingagents ] && [ -w /home/appuser/.tradingagents ]; then
+  if [ -d /home/appuser/.tradingagents ]; then
     printf '%s' "/home/appuser/.tradingagents"
     return
   fi
