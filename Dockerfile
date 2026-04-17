@@ -27,16 +27,9 @@ WORKDIR /home/appuser/app
 
 COPY --from=builder --chown=appuser:appuser /build .
 
-# Web terminal: do not auto-run the CLI (exit/Aborted closes the session and shows "Process has exited").
-# Optional: load mounted .env into the shell for `echo $DEEPSEEK_API_KEY` etc. Run `python -m cli.main` manually.
-RUN printf '%s\n' \
-    '[[ $- != *i* ]] && return' \
-    'if [ -r /home/appuser/app/.env ]; then' \
-    '  set -a' \
-    '  . /home/appuser/app/.env' \
-    '  set +a' \
-    'fi' \
-    >> /home/appuser/.bashrc
+# Do not customize .bashrc: web terminal + `source .env` can exit the session if .env is not valid shell
+# syntax; `beclab/terminal` works like context7 (no --shell flag). Use `python -m cli.main` manually;
+# `load_dotenv()` still reads /home/appuser/app/.env for the CLI process.
 
 ENTRYPOINT ["/usr/local/bin/entrypoint-web.sh"]
 CMD ["tradingagents"]
