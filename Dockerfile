@@ -27,17 +27,15 @@ WORKDIR /home/appuser/app
 
 COPY --from=builder --chown=appuser:appuser /build .
 
-# Web terminal on Olares: exec sessions may not inherit pod env — sync from PID 1 (serve.py)
-# before running the CLI. See scripts/sync_pod_env.py.
+# Web terminal: do not auto-run the CLI (exit/Aborted closes the session and shows "Process has exited").
+# Optional: load mounted .env into the shell for `echo $DEEPSEEK_API_KEY` etc. Run `python -m cli.main` manually.
 RUN printf '%s\n' \
-    'if [[ -r /proc/1/environ ]]; then' \
-    '  eval "$(/opt/venv/bin/python /home/appuser/app/scripts/sync_pod_env.py 2>/dev/null)" || true' \
-    'fi' \
-    '' \
     '[[ $- != *i* ]] && return' \
-    '[[ -t 1 ]] || return' \
-    '[[ -n "$TA_SKIP_AUTOCLI" ]] && return' \
-    'cd /home/appuser/app && /opt/venv/bin/python -m cli.main' \
+    'if [ -r /home/appuser/app/.env ]; then' \
+    '  set -a' \
+    '  . /home/appuser/app/.env' \
+    '  set +a' \
+    'fi' \
     >> /home/appuser/.bashrc
 
 ENTRYPOINT ["/usr/local/bin/entrypoint-web.sh"]
