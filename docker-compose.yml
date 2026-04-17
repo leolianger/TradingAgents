@@ -3,6 +3,9 @@ services:
     build: .
     env_file:
       - .env
+    environment:
+      # entrypoint-web.sh seeds ~/.tradingagents/.env from .env.example and links project .env
+      - TRADINGAGENTS_APPDATA=/home/appuser/.tradingagents
     volumes:
       - tradingagents_data:/home/appuser/.tradingagents
     tty: true
@@ -21,6 +24,7 @@ services:
       - .env
     environment:
       - LLM_PROVIDER=ollama
+      - TRADINGAGENTS_APPDATA=/home/appuser/.tradingagents
     volumes:
       - tradingagents_data:/home/appuser/.tradingagents
     depends_on:
