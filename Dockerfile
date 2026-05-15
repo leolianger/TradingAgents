@@ -21,7 +21,9 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY scripts/entrypoint-web.sh /usr/local/bin/entrypoint-web.sh
 RUN chmod 755 /usr/local/bin/entrypoint-web.sh
 
-RUN useradd --create-home appuser
+RUN useradd --create-home appuser \
+ && install -d -m 0755 -o appuser -g appuser /home/appuser/.tradingagents
+
 USER appuser
 WORKDIR /home/appuser/app
 

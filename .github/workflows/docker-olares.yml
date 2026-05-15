@@ -22,7 +22,7 @@ jobs:
     permissions:
       contents: read
     env:
-      IMAGE_TAG: "0.2.3"
+      IMAGE_TAG: "0.2.5"
       # GitHub Actions: opt into Node 24 for JS actions (see deprecation notice for Node 20).
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
